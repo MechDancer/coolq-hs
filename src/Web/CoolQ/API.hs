@@ -19,6 +19,10 @@ data Response a =
     }
   deriving (Show, Generic)
 
+instance (FromJSON a) => FromJSON (Response a)
+instance (ToJSON a) => ToJSON (Response a)
+
+
 newtype MessageId =
   MessageId
     { message_id :: Int
@@ -223,8 +227,6 @@ type SetRestartPluginResponse = Response Void
 type CleanDataDirResponse = Response Void
 
 type CleanPluginLogResponse = Response Void
-
-$(generateJSONInstance ''Response)
 
 $(generateJSONInstance ''Credentials)
 

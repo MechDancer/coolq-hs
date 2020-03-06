@@ -12,12 +12,16 @@ import           GHC.Generics         (Generic)
 import           Web.CoolQ.CommonData
 import           Web.CoolQ.JSONExt
 
+-----------------------------------------------------------------------------
+
 type family ResponseP post where
   ResponseP PrivateMessagePost = PrivateMessageReply
   ResponseP GroupMessagePost = GroupMessageReply
   ResponseP DiscussMessagePost = DiscussMessageReply
   ResponseP FriendAddRequestPost = FriendAddRequestReply
   ResponseP GroupAddRequestPost = GroupAddRequestReply
+
+-----------------------------------------------------------------------------
 
 data Post =
   Post
@@ -79,6 +83,8 @@ instance FromJSON Post where
       _ -> prependFailure "Unknown type" (unexpected post_type)
   parseJSON invalid = prependFailure "parsing Post failed, " (typeMismatch "Object" invalid)
 
+-----------------------------------------------------------------------------
+
 data PrivateMessagePost =
   PrivateMessagePost
     { p_post_type    :: Text
@@ -107,6 +113,8 @@ newtype PrivateMessageReply =
     { p_reply :: Message
     }
   deriving (Show, Generic)
+
+-----------------------------------------------------------------------------
 
 data GroupMessagePost =
   GroupMessagePost
@@ -149,6 +157,8 @@ data GroupMessageReply =
     }
   deriving (Show, Generic)
 
+-----------------------------------------------------------------------------
+
 data DiscussMessagePost =
   DiscussMessagePost
     { d_post_type    :: Text
@@ -178,6 +188,8 @@ data DiscussMessageReply =
     , d_at_sender :: Bool
     }
   deriving (Show, Generic)
+
+-----------------------------------------------------------------------------
 
 data GroupFileUploadPost =
   GroupFileUploadPost
@@ -242,6 +254,8 @@ data GroupBanPost =
     }
   deriving (Show, Generic)
 
+-----------------------------------------------------------------------------
+
 data FriendAddPost =
   FriendAddPost
     { fa_post_name   :: Text
@@ -267,6 +281,8 @@ data FriendAddRequestReply =
     }
   deriving (Show, Generic)
 
+-----------------------------------------------------------------------------
+
 data GroupAddRequestPost =
   GroupAddRequestPost
     { gar_post_type    :: Text
@@ -285,6 +301,8 @@ data GroupAddRequestReply =
     , gar_remark  :: Text
     }
   deriving (Show, Generic)
+
+-----------------------------------------------------------------------------
 
 data Message
   = TextMessage
@@ -321,6 +339,8 @@ newtype FaceMessageData =
     }
   deriving (Show, Generic)
 
+-----------------------------------------------------------------------------
+
 data LifecyclePost =
   LifecyclePost
     { l_post_type       :: Text
@@ -337,6 +357,8 @@ data HeartbeatPost =
     , h_interval        :: Int
     }
   deriving (Show, Generic)
+  
+-----------------------------------------------------------------------------
 
 $(generateJSONInstance ''FaceMessageData)
 
