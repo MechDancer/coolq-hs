@@ -28,6 +28,9 @@ dependencies:
 - bytestring
 - aeson
 - template-haskell
+- servant-server
+- servant-client
+- mtl
 
 library:
   source-dirs: src

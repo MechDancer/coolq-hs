@@ -42,7 +42,6 @@ generateJSONInstance name = do
   to <- generateToJSONInstance name
   return [from, to]
 
--- Following code is from https://github.com/klappvisor/haskell-telegram-api/blob/master/src/Web/Telegram/API/Bot/JsonExt.hs
 toJSONDrop ::
      forall a. (Generic a, GToJSON Zero (Rep a))
   => Int

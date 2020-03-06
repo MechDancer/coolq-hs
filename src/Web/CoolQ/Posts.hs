@@ -7,8 +7,9 @@ module Web.CoolQ.Posts where
 
 import           Data.Aeson
 import           Data.Aeson.Types
-import           Data.Text         (Text)
-import           GHC.Generics      (Generic)
+import           Data.Text            (Text)
+import           GHC.Generics         (Generic)
+import           Web.CoolQ.CommonData
 import           Web.CoolQ.JSONExt
 
 type family ResponseP post where
@@ -120,14 +121,6 @@ data GroupMessagePost =
     , g_raw_message  :: Text
     , g_font         :: Int
     , g_sender       :: GroupMessageSender
-    }
-  deriving (Show, Generic)
-
-data Anonymous =
-  Anonymous
-    { a_id   :: Int
-    , a_name :: Text
-    , a_flag :: Text
     }
   deriving (Show, Generic)
 
@@ -328,6 +321,23 @@ newtype FaceMessageData =
     }
   deriving (Show, Generic)
 
+data LifecyclePost =
+  LifecyclePost
+    { l_post_type       :: Text
+    , l_meta_event_type :: Text
+    , l_sub_type        :: Text
+    }
+  deriving (Show, Generic)
+
+data HeartbeatPost =
+  HeartbeatPost
+    { h_post_type       :: Text
+    , h_meta_event_type :: Text
+    , h_status          :: PluginStatus
+    , h_interval        :: Int
+    }
+  deriving (Show, Generic)
+
 $(generateJSONInstance ''FaceMessageData)
 
 $(generateJSONInstance ''ImageMessageData)
@@ -364,8 +374,6 @@ $(generateJSONInstance ''GroupMessageSender)
 
 $(generateJSONInstance ''DiscussMessageSender)
 
-$(generateJSONInstance ''Anonymous)
-
 $(generateJSONInstance ''DiscussMessagePost)
 
 $(generateJSONInstance ''GroupMessagePost)
@@ -375,3 +383,7 @@ $(generateJSONInstance ''PrivateMessagePost)
 $(generateJSONInstance ''PrivateMessageReply)
 
 $(generateJSONInstance ''DiscussMessageReply)
+
+$(generateJSONInstance ''LifecyclePost)
+
+$(generateJSONInstance ''HeartbeatPost)
