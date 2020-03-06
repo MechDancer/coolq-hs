@@ -48,11 +48,12 @@ toJSONDrop ::
   => Int
   -> a
   -> Value
-toJSONDrop prefix = genericToJSON defaultOptions {fieldLabelModifier = drop prefix, omitNothingFields = True}
+toJSONDrop prefix =
+  genericToJSON defaultOptions {fieldLabelModifier = drop prefix, omitNothingFields = True, sumEncoding = UntaggedValue}
 
 parseJSONDrop ::
      forall a. (Generic a, GFromJSON Zero (Rep a))
   => Int
   -> Value
   -> Parser a
-parseJSONDrop prefix = genericParseJSON defaultOptions {fieldLabelModifier = drop prefix}
+parseJSONDrop prefix = genericParseJSON defaultOptions {fieldLabelModifier = drop prefix, sumEncoding = UntaggedValue}
