@@ -4,6 +4,8 @@
 
 module Web.CoolQ.Data.JSONExt
   ( generateJSONInstance
+  , parseJSONDrop
+  , toJSONDrop
   ) where
 
 import           Data.Aeson

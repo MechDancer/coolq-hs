@@ -6,7 +6,6 @@ module Web.CoolQ.Data.API where
 import           Data.Aeson
 import           Data.Aeson.Types
 import           Data.Text            (Text)
-import           Data.Void
 import           GHC.Generics         (Generic)
 import           Web.CoolQ.Data.Common
 import           Web.CoolQ.Data.JSONExt
@@ -21,8 +20,10 @@ data Response a =
     }
   deriving (Show, Generic)
 
-instance (FromJSON a) => FromJSON (Response a)
-instance (ToJSON a) => ToJSON (Response a)
+instance (FromJSON a) => FromJSON (Response a) where
+  parseJSON = parseJSONDrop 2
+instance (ToJSON a) => ToJSON (Response a) where
+  toJSON = toJSONDrop 2
 
 -----------------------------------------------------------------------------
 
@@ -161,6 +162,8 @@ instance ToJSON VersionInfo
 
 -----------------------------------------------------------------------------
 
+type EmptyResponse = Response Value
+
 type FriendList = [FriendListEntry]
 
 type GroupMemberList = [GroupMemberInfo]
@@ -173,33 +176,35 @@ type SendGroupMessageResponse = Response MessageId
 
 type SendDiscussMessageResponse = Response MessageId
 
-type DeleteMessageResponse = Response Void
+type DeleteMessageResponse = EmptyResponse
 
-type SendLikeResponse = Response Void
+type SendLikeResponse = EmptyResponse
 
-type SetGroupKickResponse = Response Void
+type SetGroupKickResponse = EmptyResponse
 
-type SetGroupBanResponse = Response Void
+type SetGroupBanResponse = EmptyResponse
 
-type SetGroupWholeBanResponse = Response Void
+type SetGroupAnonymousBanResponse = EmptyResponse
 
-type SetGroupAdminResponse = Response Void
+type SetGroupWholeBanResponse = EmptyResponse
 
-type SetGroupAnonymousResponse = Response Void
+type SetGroupAdminResponse = EmptyResponse
 
-type SetGroupCardResponse = Response Void
+type SetGroupAnonymousResponse = EmptyResponse
 
-type SetGroupLeaveResponse = Response Void
+type SetGroupCardResponse = EmptyResponse
 
-type SetGroupSpecialTitleResponse = Response Void
+type SetGroupLeaveResponse = EmptyResponse
 
-type SetDiscussLeaveResponse = Response Void
+type SetGroupSpecialTitleResponse = EmptyResponse
 
-type SetFriendAddRequestResponse = Response Void
+type SetDiscussLeaveResponse = EmptyResponse
 
-type SetGroupAddRequestResponse = Response Void
+type SetFriendAddRequestResponse = EmptyResponse
 
-type GetLoginInfoResponse = Response LoginInfo
+type SetGroupAddRequestResponse = EmptyResponse
+
+type GetLoginInfoResponse = EmptyResponse
 
 type GetStrangerInfoResponse = Response StrangerInfo
 
@@ -229,11 +234,11 @@ type CanSendRecordResponse = Response Boolean
 
 type GetStatusResponse = Response PluginStatus
 
-type SetRestartPluginResponse = Response Void
+type SetRestartPluginResponse = EmptyResponse
 
-type CleanDataDirResponse = Response Void
+type CleanDataDirResponse = EmptyResponse
 
-type CleanPluginLogResponse = Response Void
+type CleanPluginLogResponse = EmptyResponse
 
 -----------------------------------------------------------------------------
 
