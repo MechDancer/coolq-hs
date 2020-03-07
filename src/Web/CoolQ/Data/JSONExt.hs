@@ -2,7 +2,7 @@
 {-# LANGUAGE RankNTypes       #-}
 {-# LANGUAGE TemplateHaskell  #-}
 
-module Web.CoolQ.JSONExt
+module Web.CoolQ.Data.JSONExt
   ( generateJSONInstance
   ) where
 

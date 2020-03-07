@@ -3,14 +3,14 @@
 {-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE TypeFamilies      #-}
 
-module Web.CoolQ.Posts where
+module Web.CoolQ.Data.Post where
 
 import           Data.Aeson
 import           Data.Aeson.Types
 import           Data.Text            (Text)
 import           GHC.Generics         (Generic)
-import           Web.CoolQ.CommonData
-import           Web.CoolQ.JSONExt
+import           Web.CoolQ.Data.Common
+import           Web.CoolQ.Data.JSONExt
 
 -----------------------------------------------------------------------------
 
@@ -304,43 +304,6 @@ data GroupAddRequestReply =
 
 -----------------------------------------------------------------------------
 
-data Message
-  = TextMessage
-      { t_type :: Text
-      , t_data :: TextMessageData
-      }
-  | ImageMessage
-      { i_type :: Text
-      , i_data :: ImageMessageData
-      }
-  | FaceMessage
-      { f_type :: Text
-      , f_data :: FaceMessageData
-      }
-  | Message [Message]
-  deriving (Show, Generic)
-
-newtype TextMessageData =
-  TextMessageData
-    { t_text :: Text
-    }
-  deriving (Show, Generic)
-
-data ImageMessageData =
-  ImageMessageData
-    { i_file :: Text
-    , i_url  :: Text
-    }
-  deriving (Show, Generic)
-
-newtype FaceMessageData =
-  FaceMessageData
-    { f_id :: Text
-    }
-  deriving (Show, Generic)
-
------------------------------------------------------------------------------
-
 data LifecyclePost =
   LifecyclePost
     { l_post_type       :: Text
@@ -359,14 +322,6 @@ data HeartbeatPost =
   deriving (Show, Generic)
   
 -----------------------------------------------------------------------------
-
-$(generateJSONInstance ''FaceMessageData)
-
-$(generateJSONInstance ''ImageMessageData)
-
-$(generateJSONInstance ''TextMessageData)
-
-$(generateJSONInstance ''Message)
 
 $(generateJSONInstance ''GroupAddRequestReply)
 

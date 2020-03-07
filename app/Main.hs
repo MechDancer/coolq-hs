@@ -13,7 +13,6 @@ import           Network.HTTP.Types
 import           Network.Wai
 import           Network.Wai.Handler.Warp (run)
 import           System.IO                (hFlush, readFile, stdout)
-import           Web.CoolQ.Posts
 
 app :: Application
 app req respond = do
