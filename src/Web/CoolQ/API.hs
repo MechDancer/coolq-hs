@@ -5,8 +5,9 @@
 module Web.CoolQ.API where
 
 import           Data.Aeson
+import           Data.Char             (toUpper)
 import           Data.Proxy
-import           Data.Text
+import           Data.Text             hiding (toUpper)
 import           GHC.Generics          (Generic)
 import           Servant.API
 import           Servant.Client
@@ -16,12 +17,6 @@ import           Web.CoolQ.Data.Common
 type Param = QueryParam' '[ Strict, Required]
 
 type GR = Get '[ JSON]
-
-type SendAPI
-   = "send_private_msg" :> Param "user_id" Int :> Param "message" Message :> GR SendPrivateMessageResponse :<|> "send_group_msg" :> Param "group_id" Int :> Param "message" Message :> GR SendGroupMessageResponse :<|> "send_discuss_msg" :> Param "discuss_id" Int :> Param "message" Message :> GR SendDiscussMessageResponse :<|> "delete_msg" :> Param "message_id" MessageId :> GR DeleteMessageResponse :<|> "send_like" :> Param "user_id" Int :> Param "times" Int :> GR SendLikeResponse
-
-type SetAPI
-   = "set_group_kick" :> Param "group_id" Int :> Param "user_id" Int :> QueryParam "reject_add_request" Bool :> GR SetGroupKickResponse :<|> "set_group_ban" :> Param "group_id" Int :> Param "user_id" Int :> QueryParam "duration" Int :> GR SetGroupBanResponse :<|> "set_group_anonymous_ban" :> ReqBody '[ JSON] SetGroupAnonymousBanBody :> GR SetGroupAnonymousBanResponse :<|> "set_group_whole_ban" :> Param "group_id" Int :> QueryParam "enable" Bool :> GR SetGroupWholeBanResponse :<|> "set_group_admin" :> Param "group_id" Int :> Param "user_id" Int :> QueryParam "enable" Bool :> GR SetGroupWholeBanResponse :<|> "set_group_anonymous" :> Param "group_id" Int :> QueryParam "enable" Bool :> GR SetGroupAnonymousResponse :<|> "set_group_card" :> Param "group_id" Int :> Param "user_id" Int :> QueryParam "card" Text :> GR SetGroupCardResponse :<|> "set_group_leave" :> Param "group_id" Int :> QueryParam "is_dismiss" Bool :> GR SetGroupLeaveResponse :<|> "set_group_special_title" :> Param "group_id" Int :> Param "user_id" Int :> Param "special_title" Text :> QueryParam "duration" Int :> GR SetGroupSpecialTitleResponse :<|> "set_discuss_leave" :> Param "discuss_id" Int :> GR SetDiscussLeaveResponse :<|> "set_friend_add_request" :> Param "flag" Text :> QueryParam "approve" Bool :> QueryParam "remark" Text :> GR SetFriendAddRequestResponse :<|> "set_group_add_request" :> Param "flag" Text :> Param "sub_type" Text :> QueryParam "approve" Bool :> QueryParam "reason" Text :> GR SetFriendAddRequestResponse
 
 data SetGroupAnonymousBanBody =
   SetGroupAnonymousBanBody
@@ -39,6 +34,16 @@ instance ToHttpApiData Message where
 
 instance ToHttpApiData MessageId where
   toQueryParam (MessageId id) = pack $ show id
+
+instance ToHttpApiData RecordFormat where
+  toQueryParam format =
+    pack $
+    case show format of
+      (x:xs) -> toUpper x : xs
+
+-----------------------------------------------------------------------------
+type SendAPI
+   = "send_private_msg" :> Param "user_id" Int :> Param "message" Message :> GR SendPrivateMessageResponse :<|> "send_group_msg" :> Param "group_id" Int :> Param "message" Message :> GR SendGroupMessageResponse :<|> "send_discuss_msg" :> Param "discuss_id" Int :> Param "message" Message :> GR SendDiscussMessageResponse :<|> "delete_msg" :> Param "message_id" MessageId :> GR DeleteMessageResponse :<|> "send_like" :> Param "user_id" Int :> Param "times" Int :> GR SendLikeResponse
 
 sendApi :: Proxy SendAPI
 sendApi = Proxy
@@ -63,6 +68,10 @@ sendLike ::
   -> Int -- ^ Times
   -> ClientM SendLikeResponse
 sendPrivateMessage :<|> sendGroupMessage :<|> sendDiscussMessage :<|> deleteMessage :<|> sendLike = client sendApi
+
+-----------------------------------------------------------------------------
+type SetAPI
+   = "set_group_kick" :> Param "group_id" Int :> Param "user_id" Int :> QueryParam "reject_add_request" Bool :> GR SetGroupKickResponse :<|> "set_group_ban" :> Param "group_id" Int :> Param "user_id" Int :> QueryParam "duration" Int :> GR SetGroupBanResponse :<|> "set_group_anonymous_ban" :> ReqBody '[ JSON] SetGroupAnonymousBanBody :> GR SetGroupAnonymousBanResponse :<|> "set_group_whole_ban" :> Param "group_id" Int :> QueryParam "enable" Bool :> GR SetGroupWholeBanResponse :<|> "set_group_admin" :> Param "group_id" Int :> Param "user_id" Int :> QueryParam "enable" Bool :> GR SetGroupWholeBanResponse :<|> "set_group_anonymous" :> Param "group_id" Int :> QueryParam "enable" Bool :> GR SetGroupAnonymousResponse :<|> "set_group_card" :> Param "group_id" Int :> Param "user_id" Int :> QueryParam "card" Text :> GR SetGroupCardResponse :<|> "set_group_leave" :> Param "group_id" Int :> QueryParam "is_dismiss" Bool :> GR SetGroupLeaveResponse :<|> "set_group_special_title" :> Param "group_id" Int :> Param "user_id" Int :> Param "special_title" Text :> QueryParam "duration" Int :> GR SetGroupSpecialTitleResponse :<|> "set_discuss_leave" :> Param "discuss_id" Int :> GR SetDiscussLeaveResponse :<|> "set_friend_add_request" :> Param "flag" Text :> QueryParam "approve" Bool :> QueryParam "remark" Text :> GR SetFriendAddRequestResponse :<|> "set_group_add_request" :> Param "flag" Text :> Param "sub_type" Text :> QueryParam "approve" Bool :> QueryParam "reason" Text :> GR SetFriendAddRequestResponse :<|> "set_restart_plugin" :> QueryParam "delay" Int :> GR SetRestartPluginResponse
 
 setApi :: Proxy SetAPI
 setApi = Proxy
@@ -122,5 +131,32 @@ setGroupAddRequest ::
   -> Maybe Bool -- ^ Approve. Default: `True`
   -> Maybe Text -- ^ Reason (available on disapproved)
   -> ClientM SetGroupAddRequestResponse
-setGroupKick :<|> setGroupBan :<|> setGroupAnonymousBan :<|> setGroupWholeBan :<|> setGroupAdmin :<|> setGroupAnonymous :<|> setGroupCard :<|> setGroupLeave :<|> setGroupSpecialTitle :<|> setDiscussLeave :<|> setFriendAddRequest :<|> setGroupAddRequest =
+setRestartPlugin ::
+     Maybe Int -- ^ Delay. Default: 0
+  -> ClientM SetRestartPluginResponse
+setGroupKick :<|> setGroupBan :<|> setGroupAnonymousBan :<|> setGroupWholeBan :<|> setGroupAdmin :<|> setGroupAnonymous :<|> setGroupCard :<|> setGroupLeave :<|> setGroupSpecialTitle :<|> setDiscussLeave :<|> setFriendAddRequest :<|> setGroupAddRequest :<|> setRestartPlugin =
   client setApi
+
+-----------------------------------------------------------------------------
+type GetAPI
+   = "get_login_info" :> Param "user_id" Int :> Param "nickname" Text :> GR GetLoginInfoResponse :<|> "get_stranger_info" :> Param "user_id" Int :> QueryParam "no_cache" Bool :> GR GetStrangerInfoResponse :<|> "get_friend_list" :> GR GetFriendListResponse :<|> "get_group_list" :> GR GetGroupListResponse :<|> "get_group_info" :> Param "group_id" Int :> QueryParam "no_cache" Bool :> GR GetGroupInfoResponse :<|> "get_group_member_info" :> Param "group_id" Int :> Param "user_id" Int :> QueryParam "no_cache" Bool :> GR GetGroupMemberInfoResponse :<|> "get_group_member_list" :> Param "group_id" Int :> GR GetGroupMemberListResponse :<|> "get_cookies" :> QueryParam "domain" Text :> GR GetCookiesResponse :<|> "get_csrf_token" :> GR GetCSRFTokenResponse :<|> "get_credentials" :> QueryParam "domain" Text :> GR GetCredentialsResponse :<|> "get_record" :> Param "file" FilePath :> Param "out_format" RecordFormat :> QueryParam "full_path" Bool :> GR GetRecordResponse :<|> "get_image" :> Param "file" FilePath :> GR GetImageResponse
+
+getApi :: Proxy GetAPI
+getApi = Proxy
+
+getLoginInfo :: Int -> Text -> ClientM GetGroupInfoResponse
+getStrangerInfo :: Int -> Maybe Bool -> ClientM GetStrangerInfoResponse
+getFriendList :: ClientM GetFriendListResponse
+getGroupList :: ClientM GetGroupListResponse
+getGroupInfo :: Int -> Maybe Bool -> ClientM GetGroupInfoResponse
+getGroupMemberInfo :: Int -> Int -> Maybe Bool -> ClientM GetGroupMemberInfoResponse
+getGroupMemberList :: Int -> ClientM GetGroupMemberListResponse
+getCookies :: Maybe Text -> ClientM GetCookiesResponse
+getCSRFToken :: ClientM GetCSRFTokenResponse
+getCredentials :: Maybe Text -> ClientM GetCredentialsResponse
+getRecord :: FilePath -> RecordFormat -> Maybe Bool -> ClientM GetRecordResponse
+getImage :: FilePath -> ClientM GetImageResponse
+getLoginInfo :<|> getStrangerInfo :<|> getFriendList :<|> getGroupList :<|> getGroupInfo :<|> getGroupMemberInfo :<|> getGroupMemberList :<|> getCookies :<|> getCSRFToken :<|> getCredentials :<|> getRecord :<|> getImage =
+  client getApi
+  
+-- TODO: ???

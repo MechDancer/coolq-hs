@@ -5,13 +5,12 @@ module Web.CoolQ.Data.API where
 
 import           Data.Aeson
 import           Data.Aeson.Types
-import           Data.Text            (Text)
-import           GHC.Generics         (Generic)
+import           Data.Text              (Text)
+import           GHC.Generics           (Generic)
 import           Web.CoolQ.Data.Common
 import           Web.CoolQ.Data.JSONExt
 
 -----------------------------------------------------------------------------
-
 data Response a =
   Response
     { r_status  :: String
@@ -22,11 +21,11 @@ data Response a =
 
 instance (FromJSON a) => FromJSON (Response a) where
   parseJSON = parseJSONDrop 2
+
 instance (ToJSON a) => ToJSON (Response a) where
   toJSON = toJSONDrop 2
 
 -----------------------------------------------------------------------------
-
 newtype MessageId =
   MessageId
     { message_id :: Int
@@ -78,7 +77,6 @@ instance FromJSON Boolean
 instance ToJSON Boolean
 
 -----------------------------------------------------------------------------
-
 data Credentials =
   Credentials
     { c_cookies :: String
@@ -160,8 +158,10 @@ instance FromJSON VersionInfo
 
 instance ToJSON VersionInfo
 
------------------------------------------------------------------------------
+data RecordFormat = Mp3 | Amr | Wma | M4a | Spx | Ogg | Wav | Flac deriving(Eq,Show)
 
+
+-----------------------------------------------------------------------------
 type EmptyResponse = Response Value
 
 type FriendList = [FriendListEntry]
@@ -170,6 +170,7 @@ type GroupMemberList = [GroupMemberInfo]
 
 type GroupList = [GroupListEntry]
 
+-----------------------------------------------------------------------------
 type SendPrivateMessageResponse = Response MessageId
 
 type SendGroupMessageResponse = Response MessageId
@@ -180,6 +181,7 @@ type DeleteMessageResponse = EmptyResponse
 
 type SendLikeResponse = EmptyResponse
 
+-----------------------------------------------------------------------------
 type SetGroupKickResponse = EmptyResponse
 
 type SetGroupBanResponse = EmptyResponse
@@ -204,6 +206,9 @@ type SetFriendAddRequestResponse = EmptyResponse
 
 type SetGroupAddRequestResponse = EmptyResponse
 
+type SetRestartPluginResponse = EmptyResponse
+
+-----------------------------------------------------------------------------
 type GetLoginInfoResponse = EmptyResponse
 
 type GetStrangerInfoResponse = Response StrangerInfo
@@ -216,7 +221,7 @@ type GetGroupInfoResponse = Response GroupInfo
 
 type GetGroupMemberInfoResponse = Response GroupMemberInfo
 
-type GetGroupMemberList = Response GroupMemberList
+type GetGroupMemberListResponse = Response GroupMemberList
 
 type GetCookiesResponse = Response Cookies
 
@@ -228,20 +233,18 @@ type GetRecordResponse = Response File
 
 type GetImageResponse = Response File
 
+type GetStatusResponse = Response PluginStatus
+
+-----------------------------------------------------------------------------
 type CanSendImageResponse = Response Boolean
 
 type CanSendRecordResponse = Response Boolean
-
-type GetStatusResponse = Response PluginStatus
-
-type SetRestartPluginResponse = EmptyResponse
 
 type CleanDataDirResponse = EmptyResponse
 
 type CleanPluginLogResponse = EmptyResponse
 
 -----------------------------------------------------------------------------
-
 $(generateJSONInstance ''Credentials)
 
 $(generateJSONInstance ''LoginInfo)
