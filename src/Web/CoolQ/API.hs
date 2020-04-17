@@ -144,7 +144,7 @@ type GetAPI
 getApi :: Proxy GetAPI
 getApi = Proxy
 
-getLoginInfo :: Int -> Text -> ClientM GetGroupInfoResponse
+getLoginInfo :: Int -> Text -> ClientM GetLoginInfoResponse
 getStrangerInfo :: Int -> Maybe Bool -> ClientM GetStrangerInfoResponse
 getFriendList :: ClientM GetFriendListResponse
 getGroupList :: ClientM GetGroupListResponse
@@ -159,4 +159,3 @@ getImage :: FilePath -> ClientM GetImageResponse
 getLoginInfo :<|> getStrangerInfo :<|> getFriendList :<|> getGroupList :<|> getGroupInfo :<|> getGroupMemberInfo :<|> getGroupMemberList :<|> getCookies :<|> getCSRFToken :<|> getCredentials :<|> getRecord :<|> getImage =
   client getApi
   
--- TODO: ???
