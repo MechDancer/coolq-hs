@@ -79,56 +79,56 @@ setApi = Proxy
 setGroupKick ::
      Int -- ^ Group id
   -> Int -- ^ Id of user to kick
-  -> Maybe Bool -- ^ Whether reject future requests. Default: `False`
+  -> Maybe Bool -- ^ Whether reject future requests. Default: 'False'
   -> ClientM SetGroupKickResponse
 setGroupBan ::
      Int -- ^ Group id
   -> Int -- ^ Id of user to ban
-  -> Maybe Int -- ^ Duration (seconds). Default: `30*60`
+  -> Maybe Int -- ^ Duration (seconds). Default: '30*60'
   -> ClientM SetGroupBanResponse
 setGroupAnonymousBan ::
      SetGroupAnonymousBanBody -- ^ Group and anonymous data
   -> ClientM SetGroupAnonymousBanResponse
 setGroupWholeBan ::
      Int -- ^ Group id
-  -> Maybe Bool -- ^ Enable. Default: `True`
+  -> Maybe Bool -- ^ Enable. Default: 'True'
   -> ClientM SetGroupWholeBanResponse
 setGroupAdmin ::
      Int -- ^ Group id
   -> Int -- ^ Id of user to set
-  -> Maybe Bool -- ^ Enable. Default: `True`
+  -> Maybe Bool -- ^ Enable. Default: 'True'
   -> ClientM SetGroupAdminResponse
 setGroupAnonymous ::
      Int -- ^ Group id
-  -> Maybe Bool -- ^ Enable. Default: `True`
+  -> Maybe Bool -- ^ Enable. Default: 'True'
   -> ClientM SetGroupAnonymousResponse
 setGroupCard ::
      Int -- ^ Group id
   -> Int -- ^ Id of user to set
-  -> Maybe Text -- ^ Card content, empty implies cancel. Default: ``
+  -> Maybe Text -- ^ Card content, empty implies cancel. Default: ''
   -> ClientM SetGroupCardResponse
 setGroupLeave ::
      Int -- ^ Group id
-  -> Maybe Bool -- ^ Whether dismiss the group (available on owner). Default: `False`
+  -> Maybe Bool -- ^ Whether dismiss the group (available on owner). Default: 'False'
   -> ClientM SetGroupLeaveResponse
 setGroupSpecialTitle ::
      Int -- ^ Group id
   -> Int -- ^ Id of user to set
   -> Text -- ^ Title content
-  -> Maybe Int -- ^ Duration (seconds). Default: `-1`
+  -> Maybe Int -- ^ Duration (seconds). Default: '-1'
   -> ClientM SetGroupSpecialTitleResponse
 setDiscussLeave ::
      Int -- ^ Discuss id
   -> ClientM SetDiscussLeaveResponse
 setFriendAddRequest ::
      Text -- ^ Flag passed from the request event
-  -> Maybe Bool -- ^ Approve. Default: `True`
+  -> Maybe Bool -- ^ Approve. Default: 'True'
   -> Maybe Text -- ^ Remark (available on approved)
   -> ClientM SetFriendAddRequestResponse
 setGroupAddRequest ::
      Text -- ^ Flag passed from the request event
   -> Text -- ^ Sub type passed from the request event (add or invite)
-  -> Maybe Bool -- ^ Approve. Default: `True`
+  -> Maybe Bool -- ^ Approve. Default: 'True'
   -> Maybe Text -- ^ Reason (available on disapproved)
   -> ClientM SetGroupAddRequestResponse
 setRestartPlugin ::
@@ -139,23 +139,45 @@ setGroupKick :<|> setGroupBan :<|> setGroupAnonymousBan :<|> setGroupWholeBan :<
 
 -----------------------------------------------------------------------------
 type GetAPI
-   = "get_login_info" :> Param "user_id" Int :> Param "nickname" Text :> GR GetLoginInfoResponse :<|> "get_stranger_info" :> Param "user_id" Int :> QueryParam "no_cache" Bool :> GR GetStrangerInfoResponse :<|> "get_friend_list" :> GR GetFriendListResponse :<|> "get_group_list" :> GR GetGroupListResponse :<|> "get_group_info" :> Param "group_id" Int :> QueryParam "no_cache" Bool :> GR GetGroupInfoResponse :<|> "get_group_member_info" :> Param "group_id" Int :> Param "user_id" Int :> QueryParam "no_cache" Bool :> GR GetGroupMemberInfoResponse :<|> "get_group_member_list" :> Param "group_id" Int :> GR GetGroupMemberListResponse :<|> "get_cookies" :> QueryParam "domain" Text :> GR GetCookiesResponse :<|> "get_csrf_token" :> GR GetCSRFTokenResponse :<|> "get_credentials" :> QueryParam "domain" Text :> GR GetCredentialsResponse :<|> "get_record" :> Param "file" FilePath :> Param "out_format" RecordFormat :> QueryParam "full_path" Bool :> GR GetRecordResponse :<|> "get_image" :> Param "file" FilePath :> GR GetImageResponse
+   = "get_login_info" :> GR GetLoginInfoResponse :<|> "get_stranger_info" :> Param "user_id" Int :> QueryParam "no_cache" Bool :> GR GetStrangerInfoResponse :<|> "get_friend_list" :> GR GetFriendListResponse :<|> "get_group_list" :> GR GetGroupListResponse :<|> "get_group_info" :> Param "group_id" Int :> QueryParam "no_cache" Bool :> GR GetGroupInfoResponse :<|> "get_group_member_info" :> Param "group_id" Int :> Param "user_id" Int :> QueryParam "no_cache" Bool :> GR GetGroupMemberInfoResponse :<|> "get_group_member_list" :> Param "group_id" Int :> GR GetGroupMemberListResponse :<|> "get_cookies" :> QueryParam "domain" Text :> GR GetCookiesResponse :<|> "get_csrf_token" :> GR GetCSRFTokenResponse :<|> "get_credentials" :> QueryParam "domain" Text :> GR GetCredentialsResponse :<|> "get_record" :> Param "file" FilePath :> Param "out_format" RecordFormat :> QueryParam "full_path" Bool :> GR GetRecordResponse :<|> "get_image" :> Param "file" String :> GR GetImageResponse
 
 getApi :: Proxy GetAPI
 getApi = Proxy
 
-getLoginInfo :: Int -> Text -> ClientM GetLoginInfoResponse
-getStrangerInfo :: Int -> Maybe Bool -> ClientM GetStrangerInfoResponse
+getLoginInfo :: ClientM GetLoginInfoResponse
+getStrangerInfo :: 
+  Int -> -- ^ User id
+  Maybe Bool -> -- ^ /No/ caching. Default: 'False'
+  ClientM GetStrangerInfoResponse
 getFriendList :: ClientM GetFriendListResponse
 getGroupList :: ClientM GetGroupListResponse
-getGroupInfo :: Int -> Maybe Bool -> ClientM GetGroupInfoResponse
-getGroupMemberInfo :: Int -> Int -> Maybe Bool -> ClientM GetGroupMemberInfoResponse
-getGroupMemberList :: Int -> ClientM GetGroupMemberListResponse
-getCookies :: Maybe Text -> ClientM GetCookiesResponse
+getGroupInfo :: 
+  Int -> -- ^ Group id
+  Maybe Bool -> -- ^ /No/ caching. Default: 'False'
+  ClientM GetGroupInfoResponse
+getGroupMemberInfo :: 
+  Int -> -- ^ Group id
+  Int -> -- ^ Id of user to get
+  Maybe Bool -> -- ^ /No/ caching. Default: 'False'
+  ClientM GetGroupMemberInfoResponse
+getGroupMemberList :: 
+  Int -> -- ^  Group id
+  ClientM GetGroupMemberListResponse
+getCookies :: 
+  Maybe Text -> -- ^ Domain. Default: ''
+  ClientM GetCookiesResponse
 getCSRFToken :: ClientM GetCSRFTokenResponse
-getCredentials :: Maybe Text -> ClientM GetCredentialsResponse
-getRecord :: FilePath -> RecordFormat -> Maybe Bool -> ClientM GetRecordResponse
-getImage :: FilePath -> ClientM GetImageResponse
+getCredentials :: 
+  Maybe Text -> -- ^ Domain. Default: ''
+  ClientM GetCredentialsResponse
+getRecord :: 
+  FilePath -> -- ^ File
+  RecordFormat -> -- ^ Output format
+  Maybe Bool -> -- Full file path. Default: 'False', recommended to be 'True' on @@Windows@@.
+  ClientM GetRecordResponse
+getImage :: 
+  String -> -- ^ Field @@file@@ in 'ImageMessage'
+  ClientM GetImageResponse
 getLoginInfo :<|> getStrangerInfo :<|> getFriendList :<|> getGroupList :<|> getGroupInfo :<|> getGroupMemberInfo :<|> getGroupMemberList :<|> getCookies :<|> getCSRFToken :<|> getCredentials :<|> getRecord :<|> getImage =
   client getApi
   

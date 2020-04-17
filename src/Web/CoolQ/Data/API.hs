@@ -209,7 +209,7 @@ type SetGroupAddRequestResponse = EmptyResponse
 type SetRestartPluginResponse = EmptyResponse
 
 -----------------------------------------------------------------------------
-type GetLoginInfoResponse = EmptyResponse
+type GetLoginInfoResponse = Response LoginInfo
 
 type GetStrangerInfoResponse = Response StrangerInfo
 
