@@ -145,39 +145,38 @@ getApi :: Proxy GetAPI
 getApi = Proxy
 
 getLoginInfo :: ClientM GetLoginInfoResponse
-getStrangerInfo :: 
-  Int -> -- ^ User id
-  Maybe Bool -> -- ^ /No/ caching. Default: 'False'
-  ClientM GetStrangerInfoResponse
+getStrangerInfo ::
+     Int -- ^ User id
+  -> Maybe Bool -- ^ /No/ caching. Default: 'False'
+  -> ClientM GetStrangerInfoResponse
 getFriendList :: ClientM GetFriendListResponse
 getGroupList :: ClientM GetGroupListResponse
-getGroupInfo :: 
-  Int -> -- ^ Group id
-  Maybe Bool -> -- ^ /No/ caching. Default: 'False'
-  ClientM GetGroupInfoResponse
-getGroupMemberInfo :: 
-  Int -> -- ^ Group id
-  Int -> -- ^ Id of user to get
-  Maybe Bool -> -- ^ /No/ caching. Default: 'False'
-  ClientM GetGroupMemberInfoResponse
-getGroupMemberList :: 
-  Int -> -- ^  Group id
-  ClientM GetGroupMemberListResponse
-getCookies :: 
-  Maybe Text -> -- ^ Domain. Default: ''
-  ClientM GetCookiesResponse
+getGroupInfo ::
+     Int -- ^ Group id
+  -> Maybe Bool -- ^ /No/ caching. Default: 'False'
+  -> ClientM GetGroupInfoResponse
+getGroupMemberInfo ::
+     Int -- ^ Group id
+  -> Int -- ^ Id of user to get
+  -> Maybe Bool -- ^ /No/ caching. Default: 'False'
+  -> ClientM GetGroupMemberInfoResponse
+getGroupMemberList ::
+     Int -- ^  Group id
+  -> ClientM GetGroupMemberListResponse
+getCookies ::
+     Maybe Text -- ^ Domain. Default: ''
+  -> ClientM GetCookiesResponse
 getCSRFToken :: ClientM GetCSRFTokenResponse
-getCredentials :: 
-  Maybe Text -> -- ^ Domain. Default: ''
-  ClientM GetCredentialsResponse
-getRecord :: 
-  FilePath -> -- ^ File
-  RecordFormat -> -- ^ Output format
-  Maybe Bool -> -- Full file path. Default: 'False', recommended to be 'True' on @@Windows@@.
-  ClientM GetRecordResponse
-getImage :: 
-  String -> -- ^ Field @@file@@ in 'ImageMessage'
-  ClientM GetImageResponse
+getCredentials ::
+     Maybe Text -- ^ Domain. Default: ''
+  -> ClientM GetCredentialsResponse
+getRecord ::
+     FilePath -- ^ File
+  -> RecordFormat -- ^ Output format
+  -> Maybe Bool -- Full file path. Default: 'False', recommended to be 'True' on @@Windows@@.
+  -> ClientM GetRecordResponse
+getImage ::
+     String -- ^ Field @file@ in 'ImageMessage'
+  -> ClientM GetImageResponse
 getLoginInfo :<|> getStrangerInfo :<|> getFriendList :<|> getGroupList :<|> getGroupInfo :<|> getGroupMemberInfo :<|> getGroupMemberList :<|> getCookies :<|> getCSRFToken :<|> getCredentials :<|> getRecord :<|> getImage =
   client getApi
-  
