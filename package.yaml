@@ -1,7 +1,7 @@
 name:                coolq-hs
 version:             0.1.0.0
 github:              "MechDancer"
-license:             BSD3
+license:             WTFPL
 author:              "berberman"
 maintainer:          "berberman@mechdancer.org"
 copyright:           "2020 MechDancer"
