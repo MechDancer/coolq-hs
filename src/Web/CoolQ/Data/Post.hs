@@ -1,19 +1,23 @@
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell   #-}
-{-# LANGUAGE TypeFamilies      #-}
+{-# LANGUAGE DeriveGeneric       #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE RecordWildCards     #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TemplateHaskell     #-}
+{-# LANGUAGE TypeFamilies        #-}
 
 module Web.CoolQ.Data.Post where
 
 import           Data.Aeson
 import           Data.Aeson.Types
-import           Data.Text            (Text)
-import           GHC.Generics         (Generic)
+import           Data.Data              (Typeable)
+import           Data.Dynamic           (Dynamic, fromDynamic, toDyn)
+import           Data.Maybe             (fromJust)
+import           Data.Text              (Text)
+import           GHC.Generics           (Generic)
 import           Web.CoolQ.Data.Common
 import           Web.CoolQ.Data.JSONExt
 
 -----------------------------------------------------------------------------
-
 type family ResponseP post where
   ResponseP PrivateMessagePost = PrivateMessageReply
   ResponseP GroupMessagePost = GroupMessageReply
@@ -21,8 +25,33 @@ type family ResponseP post where
   ResponseP FriendAddRequestPost = FriendAddRequestReply
   ResponseP GroupAddRequestPost = GroupAddRequestReply
 
------------------------------------------------------------------------------
+class (Typeable a, Show a) =>
+      PostContent a
 
+
+instance PostContent PrivateMessagePost
+
+instance PostContent GroupMessagePost
+
+instance PostContent DiscussMessagePost
+
+instance PostContent GroupFileUploadPost
+
+instance PostContent GroupAdminChangePost
+
+instance PostContent GroupMemberDecreasePost
+
+instance PostContent GroupMemberIncreasePost
+
+instance PostContent GroupBanPost
+
+instance PostContent GroupAddRequestPost
+
+instance PostContent FriendAddPost
+
+instance PostContent FriendAddRequestPost
+
+-----------------------------------------------------------------------------
 data Post =
   Post
     { private_message       :: Maybe PrivateMessagePost
@@ -54,6 +83,30 @@ emptyPost =
     , friend_add_request = Nothing
     }
 
+extractFromPost' :: Post -> Maybe Dynamic
+extractFromPost' Post {..} = x
+  where
+    x =
+      wrap private_message |> wrap group_message |> wrap discuss_message |> wrap group_file_upload |> wrap group_admin_change |>
+      wrap group_member_decrease |>
+      wrap group_member_increase |>
+      wrap group_ban |>
+      wrap group_add_request |>
+      wrap friend_add |>
+      wrap friend_add_request
+    (|>) :: Maybe Dynamic -> Maybe Dynamic -> Maybe Dynamic
+    (|>) (Just x) _ = Just x
+    (|>) _ (Just x) = Just x
+    (|>) _ Nothing  = Nothing
+    infixl |>
+    wrap Nothing  = Nothing
+    wrap (Just x) = Just $ toDyn x
+
+extractFromPost :: (PostContent a) => Post -> Maybe a
+extractFromPost p = unwrap <$> extractFromPost' p
+  where
+    unwrap = fromJust . fromDynamic
+
 instance FromJSON Post where
   parseJSON v@(Object obj) = do
     post_type <- obj .: "post_type" :: Parser Value
@@ -84,7 +137,6 @@ instance FromJSON Post where
   parseJSON invalid = prependFailure "parsing Post failed, " (typeMismatch "Object" invalid)
 
 -----------------------------------------------------------------------------
-
 data PrivateMessagePost =
   PrivateMessagePost
     { p_post_type    :: Text
@@ -115,7 +167,6 @@ newtype PrivateMessageReply =
   deriving (Show, Generic)
 
 -----------------------------------------------------------------------------
-
 data GroupMessagePost =
   GroupMessagePost
     { g_post_type    :: Text
@@ -125,7 +176,7 @@ data GroupMessagePost =
     , g_group_id     :: Int
     , g_user_id      :: Int
     , g_message      :: Message
-    , g_anonymous    :: Anonymous
+    , g_anonymous    :: Maybe Anonymous
     , g_raw_message  :: Text
     , g_font         :: Int
     , g_sender       :: GroupMessageSender
@@ -158,7 +209,6 @@ data GroupMessageReply =
   deriving (Show, Generic)
 
 -----------------------------------------------------------------------------
-
 data DiscussMessagePost =
   DiscussMessagePost
     { d_post_type    :: Text
@@ -190,7 +240,6 @@ data DiscussMessageReply =
   deriving (Show, Generic)
 
 -----------------------------------------------------------------------------
-
 data GroupFileUploadPost =
   GroupFileUploadPost
     { gfu_post_type   :: Text
@@ -255,7 +304,6 @@ data GroupBanPost =
   deriving (Show, Generic)
 
 -----------------------------------------------------------------------------
-
 data FriendAddPost =
   FriendAddPost
     { fa_post_name   :: Text
@@ -282,7 +330,6 @@ data FriendAddRequestReply =
   deriving (Show, Generic)
 
 -----------------------------------------------------------------------------
-
 data GroupAddRequestPost =
   GroupAddRequestPost
     { gar_post_type    :: Text
@@ -303,7 +350,6 @@ data GroupAddRequestReply =
   deriving (Show, Generic)
 
 -----------------------------------------------------------------------------
-
 data LifecyclePost =
   LifecyclePost
     { l_post_type       :: Text
@@ -320,9 +366,8 @@ data HeartbeatPost =
     , h_interval        :: Int
     }
   deriving (Show, Generic)
-  
------------------------------------------------------------------------------
 
+-----------------------------------------------------------------------------
 $(generateJSONInstance ''GroupAddRequestReply)
 
 $(generateJSONInstance ''GroupAddRequestPost)
