@@ -158,8 +158,18 @@ instance FromJSON VersionInfo
 
 instance ToJSON VersionInfo
 
-data RecordFormat = Mp3 | Amr | Wma | M4a | Spx | Ogg | Wav | Flac deriving(Eq,Show)
+data RecordFormat
+  = Mp3
+  | Amr
+  | Wma
+  | M4a
+  | Spx
+  | Ogg
+  | Wav
+  | Flac
+  deriving (Eq, Show)
 
+data DataDirType = Image | Record | Show| Bface deriving (Eq,Show)
 
 -----------------------------------------------------------------------------
 type EmptyResponse = Response Value
@@ -234,6 +244,8 @@ type GetRecordResponse = Response File
 type GetImageResponse = Response File
 
 type GetStatusResponse = Response PluginStatus
+
+type GetVersionInfoResponse = Response VersionInfo
 
 -----------------------------------------------------------------------------
 type CanSendImageResponse = Response Boolean
