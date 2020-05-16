@@ -5,9 +5,9 @@
 module Web.CoolQ.API where
 
 import           Data.Aeson
-import           Data.Char             (toUpper)
+import           Data.Char             (toLower)
 import           Data.Proxy
-import           Data.Text             hiding (toUpper)
+import           Data.Text             hiding (toLower)
 import           GHC.Generics          (Generic)
 import           Servant.API
 import           Servant.Client
@@ -35,11 +35,13 @@ instance ToHttpApiData Message where
 instance ToHttpApiData MessageId where
   toQueryParam (MessageId id) = pack $ show id
 
+toLowerFst (x:xs) = toLower x : xs
+
 instance ToHttpApiData RecordFormat where
-  toQueryParam format =
-    pack $
-    case show format of
-      (x:xs) -> toUpper x : xs
+  toQueryParam = pack . toLowerFst . show
+
+instance ToHttpApiData DataDirType where
+  toQueryParam = pack . toLowerFst . show
 
 -----------------------------------------------------------------------------
 type SendAPI
@@ -139,7 +141,7 @@ setGroupKick :<|> setGroupBan :<|> setGroupAnonymousBan :<|> setGroupWholeBan :<
 
 -----------------------------------------------------------------------------
 type GetAPI
-   = "get_login_info" :> GR GetLoginInfoResponse :<|> "get_stranger_info" :> Param "user_id" Int :> QueryParam "no_cache" Bool :> GR GetStrangerInfoResponse :<|> "get_friend_list" :> GR GetFriendListResponse :<|> "get_group_list" :> GR GetGroupListResponse :<|> "get_group_info" :> Param "group_id" Int :> QueryParam "no_cache" Bool :> GR GetGroupInfoResponse :<|> "get_group_member_info" :> Param "group_id" Int :> Param "user_id" Int :> QueryParam "no_cache" Bool :> GR GetGroupMemberInfoResponse :<|> "get_group_member_list" :> Param "group_id" Int :> GR GetGroupMemberListResponse :<|> "get_cookies" :> QueryParam "domain" Text :> GR GetCookiesResponse :<|> "get_csrf_token" :> GR GetCSRFTokenResponse :<|> "get_credentials" :> QueryParam "domain" Text :> GR GetCredentialsResponse :<|> "get_record" :> Param "file" FilePath :> Param "out_format" RecordFormat :> QueryParam "full_path" Bool :> GR GetRecordResponse :<|> "get_image" :> Param "file" String :> GR GetImageResponse
+   = "get_login_info" :> GR GetLoginInfoResponse :<|> "get_stranger_info" :> Param "user_id" Int :> QueryParam "no_cache" Bool :> GR GetStrangerInfoResponse :<|> "get_friend_list" :> GR GetFriendListResponse :<|> "get_group_list" :> GR GetGroupListResponse :<|> "get_group_info" :> Param "group_id" Int :> QueryParam "no_cache" Bool :> GR GetGroupInfoResponse :<|> "get_group_member_info" :> Param "group_id" Int :> Param "user_id" Int :> QueryParam "no_cache" Bool :> GR GetGroupMemberInfoResponse :<|> "get_group_member_list" :> Param "group_id" Int :> GR GetGroupMemberListResponse :<|> "get_cookies" :> QueryParam "domain" Text :> GR GetCookiesResponse :<|> "get_csrf_token" :> GR GetCSRFTokenResponse :<|> "get_credentials" :> QueryParam "domain" Text :> GR GetCredentialsResponse :<|> "get_record" :> Param "file" FilePath :> Param "out_format" RecordFormat :> QueryParam "full_path" Bool :> GR GetRecordResponse :<|> "get_image" :> Param "file" String :> GR GetImageResponse :<|> "get_status" :> GR GetStatusResponse :<|> "get_version_info" :> GR GetVersionInfoResponse
 
 getApi :: Proxy GetAPI
 getApi = Proxy
@@ -178,5 +180,22 @@ getRecord ::
 getImage ::
      String -- ^ Field @file@ in 'ImageMessage'
   -> ClientM GetImageResponse
-getLoginInfo :<|> getStrangerInfo :<|> getFriendList :<|> getGroupList :<|> getGroupInfo :<|> getGroupMemberInfo :<|> getGroupMemberList :<|> getCookies :<|> getCSRFToken :<|> getCredentials :<|> getRecord :<|> getImage =
+getStatus :: ClientM GetStatusResponse
+getVersionInfo :: ClientM GetVersionInfoResponse
+getLoginInfo :<|> getStrangerInfo :<|> getFriendList :<|> getGroupList :<|> getGroupInfo :<|> getGroupMemberInfo :<|> getGroupMemberList :<|> getCookies :<|> getCSRFToken :<|> getCredentials :<|> getRecord :<|> getImage :<|> getStatus :<|> getVersionInfo =
   client getApi
+
+-----------------------------------------------------------------------------
+type OtherApi
+   = "can_send_image" :> GR CanSendImageResponse :<|> "can_send_record" :> GR CanSendRecordResponse :<|> "clean_data_dir" :> Param "data_dir" DataDirType :> GR CleanDataDirResponse :<|> "clean_plugin_log" :> GR CleanPluginLogResponse
+
+otherApi :: Proxy OtherApi
+otherApi = Proxy
+
+canSendImage :: ClientM CanSendImageResponse
+canSendRecord :: ClientM CanSendRecordResponse
+cleanDataDir ::
+     DataDirType -- ^ Dir to clean
+  -> ClientM CleanDataDirResponse
+cleanPluginLog :: ClientM CleanPluginLogResponse
+canSendImage :<|> canSendRecord :<|> cleanDataDir :<|> cleanPluginLog = client otherApi
