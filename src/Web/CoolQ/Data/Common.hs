@@ -25,12 +25,14 @@ faceMessage ::
   -> Message
 faceMessage id = FaceMessage "face" $ FaceMessageData id
 
-
 instance Semigroup Message where
   Message m <> Message n = Message $ m <> n
   Message m <> n = Message $ m <> [n]
   m <> Message n = Message $ m : n
   m <> n = Message [m, n]
+
+instance Monoid Message where
+  mempty = Message []
 
 data Message
   = TextMessage

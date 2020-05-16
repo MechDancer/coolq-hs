@@ -2,23 +2,23 @@ module Web.CoolQ.Data.Common.Builder where
 
 import           Web.CoolQ.Data.Common
 
-import           Control.Monad.State   (StateT, execStateT, modify)
+import           Control.Monad.Writer  (WriterT, execWriterT, tell)
 import           Data.Functor.Identity (Identity, runIdentity)
 import           Data.Text             (Text)
 
-type MessageBuilderT = StateT Message
+type MessageBuilderT = WriterT Message
 
 text :: (Monad m) => Text -> MessageBuilderT m ()
-text t = modify (<> textMessage t)
+text t = tell $ textMessage t
 
 image :: (Monad m) => Text -> MessageBuilderT m ()
-image file = modify (<> imageMessage file)
+image file = tell $ imageMessage file
 
 face :: (Monad m) => Text -> MessageBuilderT m ()
-face id = modify (<> faceMessage id)
+face id = tell $ faceMessage id
 
 buildMessageT :: (Monad m) => MessageBuilderT m a -> m Message
-buildMessageT builder = execStateT builder (Message [])
+buildMessageT = execWriterT
 
 buildMessage :: MessageBuilderT Identity a -> Message
 buildMessage = runIdentity . buildMessageT
